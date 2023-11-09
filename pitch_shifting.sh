@@ -35,20 +35,31 @@ install_rubberband() {
   esac
 }
 
-# Ask for the directory containing the audio files
-read -p "Enter the directory path of your audio files: " DIRECTORY
+# Prompt for input and output directories
+read -p "Enter the source directory path of your audio files: " SOURCE_DIRECTORY
+read -p "Enter the destination directory path for the pitch-shifted audio files: " DESTINATION_DIRECTORY
 
-# Check if the provided directory exists
-if [ ! -d "$DIRECTORY" ]; then
-  echo "The directory $DIRECTORY does not exist. Please enter a valid directory."
+# Check if the source directory exists
+if [ ! -d "$SOURCE_DIRECTORY" ]; then
+  echo "The source directory $SOURCE_DIRECTORY does not exist. Please enter a valid directory."
   exit 1
 fi
 
-# Check and install rubberband
+# Check if the destination directory exists, if not, create it
+if [ ! -d "$DESTINATION_DIRECTORY" ]; then
+  echo "The destination directory $DESTINATION_DIRECTORY does not exist. Creating it now..."
+  mkdir -p "$DESTINATION_DIRECTORY"
+fi
+
+# Ask for min and max pitch values
+read -p "Enter the minimum pitch shift value: " MIN_PITCH
+read -p "Enter the maximum pitch shift value: " MAX_PITCH
+
+# Ensure rubberband is installed before proceeding
 check_rubberband
 
-# Loop over all files in the directory
-for file in "$DIRECTORY"/*; do
+# Loop over all files in the source directory and apply pitch shifting
+for file in "$SOURCE_DIRECTORY"/*; do
   # Skip if it's not a file
   if [ ! -f "$file" ]; then
     continue
@@ -59,21 +70,21 @@ for file in "$DIRECTORY"/*; do
   extension="${filename##*.}"
   filename="${filename%.*}"
 
-  # Perform pitch shifting from -5 to +5
-  for i in {-5..5}; do
+  # Perform pitch shifting within the user-specified range
+  for (( i=$MIN_PITCH; i<=$MAX_PITCH; i++ )); do
     # Skip the pitch shifting for 0 as it is the original file
     if [ "$i" -eq 0 ]; then
       continue
     fi
     
-    # Construct the output filename
-    output_filename="${DIRECTORY}/${filename}_pitch_${i}.${extension}"
+    # Construct the output filename in the destination directory
+    output_filename="${DESTINATION_DIRECTORY}/${filename}_pitch_${i}.${extension}"
 
     # Apply pitch shifting
     rubberband -p $i "$file" "$output_filename"
     
-    echo "Created pitch shifted version: $output_filename"
+    echo "Created pitch-shifted version: $output_filename"
   done
 done
 
-echo "Pitch shifting complete for all files in $DIRECTORY."
+echo "Pitch shifting complete for files in $SOURCE_DIRECTORY. Check $DESTINATION_DIRECTORY for output."
