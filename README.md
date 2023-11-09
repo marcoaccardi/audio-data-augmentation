@@ -31,6 +31,19 @@ The scripts will guide you through the installation process if these tools are n
 
 Note: Always replace placeholders with your specific paths and details.
 
+
+## Windows
+- the power shell scripts are in the windows folder
+
+### Installation
+[ffmpeg](https://phoenixnap.com/kb/ffmpeg-windows)
+[rubberband](https://breakfastquay.com/rubberband/)
+
+### How to run the scripts
+- Right-click on the saved file and select "Run with PowerShell".
+- Ensure that rubberband is installed and added to your system's PATH before running the script.
+
+
 ## Contributing
 Feel free to fork, modify, and send pull requests. Bug reports and suggestions for improvements are also welcome.
 
